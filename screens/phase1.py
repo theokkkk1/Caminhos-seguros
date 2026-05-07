@@ -240,7 +240,7 @@ def draw_car(screen, car):
 # GAME
 # =========================
 
-def run_game(screen):
+def run_phase1(screen):
 
     global has_crosswalk
     global has_ramp
@@ -574,7 +574,7 @@ def run_game(screen):
     screen.blit(faixa_text, (25, 28))
     screen.blit(rampa_text, (25, 68))
 
-    # =========================
+        # =========================
     # VITÓRIA
     # =========================
 
@@ -590,16 +590,18 @@ def run_game(screen):
 
             screen.blit(overlay, (0, 0))
 
+            # caixa branca
             pygame.draw.rect(
                 screen,
                 WHITE,
-                (120, 170, 560, 220),
+                (90, 170, 620, 220),
                 border_radius=20
             )
 
+            # fontes
             victory_font = pygame.font.SysFont(
                 "Arial",
-                42,
+                34,
                 bold=True
             )
 
@@ -608,6 +610,7 @@ def run_game(screen):
                 26
             )
 
+            # textos
             title = victory_font.render(
                 "VOCÊ CHEGOU AO HOSPITAL!",
                 True,
@@ -620,8 +623,25 @@ def run_game(screen):
                 BLACK
             )
 
-            screen.blit(title, (150, 230))
-            screen.blit(desc, (240, 300))
+            # título centralizado
+            screen.blit(
+                title,
+                (
+                    WIDTH // 2 - title.get_width() // 2,
+                    245
+                )
+            )
 
-            pygame.draw.rect(screen, RED, (365, 335, 70, 20))
-            pygame.draw.rect(screen, RED, (390, 310, 20, 70))
+            # descrição centralizada
+            screen.blit(
+                desc,
+                (
+                    WIDTH // 2 - desc.get_width() // 2,
+                    315
+                )
+            )
+
+            pygame.display.update()
+            pygame.time.delay(1500)
+
+            return "phase2"
