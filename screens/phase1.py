@@ -50,6 +50,7 @@ ramp_item = pygame.Rect(640, 500, 40, 40)
 
 has_crosswalk = False
 has_ramp = False
+entered_by_crosswalk = False
 
 # =========================
 # BARREIRA
@@ -108,12 +109,14 @@ def reset_game():
 
     global has_crosswalk
     global has_ramp
+    global entered_by_crosswalk
 
     player.x = 120
     player.y = 500
 
     has_crosswalk = False
     has_ramp = False
+    entered_by_crosswalk = False
 
     for car in cars:
         car.y = random.randint(-600, -50)
@@ -244,6 +247,7 @@ def run_phase1(screen):
 
     global has_crosswalk
     global has_ramp
+    global entered_by_crosswalk
 
     keys = pygame.key.get_pressed()
 
@@ -308,24 +312,35 @@ def run_phase1(screen):
         has_ramp = True
 
     # =========================
-    # GAME OVER SEM FAIXA
+    # REGRAS DA FAIXA
     # =========================
 
     road_zone = pygame.Rect(320, 0, 160, HEIGHT)
+    crosswalk_zone = pygame.Rect(300, 390, 200, 120)
 
     if player.colliderect(road_zone):
 
-        if not has_crosswalk:
+        pode_passar = False
 
-            game_over_font = pygame.font.SysFont("Arial", 45, bold=True)
+        # Está sobre a faixa e possui o item
+        if has_crosswalk and player.colliderect(crosswalk_zone):
+            pode_passar = True
+
+        if not pode_passar:
+
+            game_over_font = pygame.font.SysFont(
+                "Arial",
+                45,
+                bold=True
+            )
 
             txt = game_over_font.render(
-                "Use a faixa",
+                "USE A FAIXA",
                 True,
                 RED
             )
 
-            screen.blit(txt, (250, 260))
+            screen.blit(txt, (230, 260))
 
             pygame.display.update()
             pygame.time.delay(1200)

@@ -814,8 +814,11 @@ def run_phase2(screen):
 
                 pygame.display.update()
 
-                pygame.time.delay(2500)
+                pygame.time.delay(1500)
 
-                return "menu"
+                return "phase3"
 
         pygame.display.update()
+
+        
+        

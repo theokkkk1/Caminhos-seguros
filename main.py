@@ -4,6 +4,7 @@ import screens.menu as draw_menu
 from screens.controls import draw_controls
 from screens.phase1 import run_phase1
 from screens.phase2 import run_phase2
+from screens.phase3 import run_phase3
 
 pygame.init()
 
@@ -26,6 +27,7 @@ clock = pygame.time.Clock()
 MENU = "menu"
 PHASE1 = "phase1"
 PHASE2 = "phase2"
+PHASE3 = "phase3"
 CONTROLS = "controls"
 
 current_screen = MENU
@@ -54,18 +56,14 @@ while running:
 
             mouse_pos = pygame.mouse.get_pos()
 
-            # MENU
             if current_screen == MENU:
 
-                # JOGAR
                 if draw_menu.play_button.collidepoint(mouse_pos):
                     current_screen = PHASE1
 
-                # CONTROLES
                 if draw_menu.controls_button.collidepoint(mouse_pos):
                     current_screen = CONTROLS
 
-                # SAIR
                 if draw_menu.exit_button.collidepoint(mouse_pos):
                     running = False
 
@@ -75,20 +73,22 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            # CONTROLES
             if current_screen == CONTROLS:
 
                 if event.key == pygame.K_ESCAPE:
                     current_screen = MENU
 
-            # FASE 1
             elif current_screen == PHASE1:
 
                 if event.key == pygame.K_ESCAPE:
                     current_screen = MENU
 
-            # FASE 2
             elif current_screen == PHASE2:
+
+                if event.key == pygame.K_ESCAPE:
+                    current_screen = MENU
+
+            elif current_screen == PHASE3:
 
                 if event.key == pygame.K_ESCAPE:
                     current_screen = MENU
@@ -98,9 +98,11 @@ while running:
     # ==========================
 
     if current_screen == MENU:
+
         draw_menu.draw_menu(screen)
 
     elif current_screen == CONTROLS:
+
         draw_controls(screen)
 
     elif current_screen == PHASE1:
@@ -113,6 +115,13 @@ while running:
     elif current_screen == PHASE2:
 
         next_screen = run_phase2(screen)
+
+        if next_screen:
+            current_screen = next_screen
+
+    elif current_screen == PHASE3:
+
+        next_screen = run_phase3(screen)
 
         if next_screen:
             current_screen = next_screen
