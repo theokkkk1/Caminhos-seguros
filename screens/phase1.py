@@ -265,6 +265,7 @@ def run_phase1(screen):
 
     if keys[pygame.K_DOWN] or keys[pygame.K_s]:
         player.y += player_speed
+        
 
     # =========================
     # LIMITES
@@ -319,7 +320,7 @@ def run_phase1(screen):
             game_over_font = pygame.font.SysFont("Arial", 45, bold=True)
 
             txt = game_over_font.render(
-                "GAME OVER",
+                "Use a faixa",
                 True,
                 RED
             )
@@ -578,7 +579,7 @@ def run_phase1(screen):
     # VITÓRIA
     # =========================
 
-    hospital_area = pygame.Rect(600, 70, 140, 150)
+    hospital_area = pygame.Rect(590, 60, 170, 180)
 
     if player.colliderect(hospital_area):
 
