@@ -73,7 +73,12 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if current_screen == CONTROLS:
+            if current_screen == MENU:
+
+                if event.key == pygame.K_3:
+                    current_screen = PHASE3
+
+            elif current_screen == CONTROLS:
 
                 if event.key == pygame.K_ESCAPE:
                     current_screen = MENU

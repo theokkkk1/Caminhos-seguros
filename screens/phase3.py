@@ -24,8 +24,11 @@ GREEN = (40, 180, 40)
 
 BLUE = (50, 90, 220)
 RED = (230, 40, 40)
+DARK_RED = (150, 20, 20)
 
 YELLOW = (255, 225, 70)
+ORANGE = (255, 150, 40)
+GRAY = (120, 120, 120)
 
 SKY = (120, 190, 255)
 
@@ -37,10 +40,10 @@ player = pygame.Rect(80, 500, 26, 42)
 player_speed = 4
 
 # =========================
-# HOSPITAL
+# ESCOLA
 # =========================
 
-hospital = pygame.Rect(640, 60, 120, 120)
+school = pygame.Rect(640, 60, 120, 120)
 
 # =========================
 # PISO TÁTIL
@@ -83,6 +86,14 @@ road = pygame.Rect(250, 200, 300, 160)
 crosswalk = pygame.Rect(330, 200, 120, 160)
 
 # =========================
+# BOTÃO DO SEMÁFORO
+# =========================
+
+crossing_button = pygame.Rect(300, 370, 42, 42)
+crosswalk_active = False
+button_message_timer = 0
+
+# =========================
 # CARROS
 # =========================
 
@@ -100,6 +111,7 @@ for i in range(3):
     )
 
 car_speed = 5
+stopped_car_speed = 0
 
 # =========================
 # FONTE
@@ -113,8 +125,13 @@ font = pygame.font.SysFont("Arial", 24, bold=True)
 
 def reset_game():
 
+    global crosswalk_active, button_message_timer
+
     player.x = 80
     player.y = 500
+
+    crosswalk_active = False
+    button_message_timer = 0
 
     for car in cars:
         car.x = random.randint(-500, -50)
@@ -179,20 +196,55 @@ def draw_car(screen, car):
     pygame.draw.circle(screen, BLACK, (car.x + 68, car.y + 40), 5)
 
 # =========================
-# HOSPITAL
+# ESCOLA
 # =========================
 
-def draw_hospital(screen):
+def draw_school(screen):
 
     pygame.draw.rect(
         screen,
         (235, 235, 235),
-        hospital,
+        school,
         border_radius=15
     )
 
-    pygame.draw.rect(screen, RED, (690, 90, 20, 60))
-    pygame.draw.rect(screen, RED, (670, 110, 60, 20))
+    pygame.draw.rect(screen, (120, 80, 40), (680, 125, 40, 55))
+    pygame.draw.rect(screen, SKY, (655, 85, 28, 28))
+    pygame.draw.rect(screen, SKY, (717, 85, 28, 28))
+
+    roof_points = [
+        (630, 70),
+        (700, 25),
+        (770, 70)
+    ]
+    pygame.draw.polygon(screen, DARK_RED, roof_points)
+
+    title_font = pygame.font.SysFont("Arial", 20, bold=True)
+    title = title_font.render("ESCOLA", True, BLACK)
+    screen.blit(title, (665, 145))
+
+
+def draw_crossing_button(screen):
+
+    button_color = GREEN if crosswalk_active else ORANGE
+
+    pygame.draw.rect(
+        screen,
+        GRAY,
+        crossing_button,
+        border_radius=8
+    )
+
+    pygame.draw.circle(
+        screen,
+        button_color,
+        crossing_button.center,
+        14
+    )
+
+    label_font = pygame.font.SysFont("Arial", 16, bold=True)
+    label = label_font.render("BOTAO", True, BLACK)
+    screen.blit(label, (crossing_button.x - 8, crossing_button.y + 48))
 
 # =========================
 # VISÃO REDUZIDA
@@ -219,6 +271,8 @@ def draw_vision_effect(screen):
 
 def run_phase3(screen):
 
+    global crosswalk_active, button_message_timer
+
     keys = pygame.key.get_pressed()
 
     # =========================
@@ -236,6 +290,14 @@ def run_phase3(screen):
 
     if keys[pygame.K_d]:
         player.x += player_speed
+
+    # =========================
+    # ACIONAR BOTÃO DA FAIXA
+    # =========================
+
+    if player.colliderect(crossing_button) and keys[pygame.K_e]:
+        crosswalk_active = True
+        button_message_timer = 120
 
     # =========================
     # LIMITES
@@ -259,7 +321,10 @@ def run_phase3(screen):
 
     for car in cars:
 
-        car.x += car_speed
+        if crosswalk_active:
+            car.x += stopped_car_speed
+        else:
+            car.x += car_speed
 
         if car.x > WIDTH + 100:
             car.x = random.randint(-400, -100)
@@ -269,19 +334,24 @@ def run_phase3(screen):
             reset_game()
 
     # =========================
-    # ATRAVESSAR FORA DA FAIXA
+    # ATRAVESSAR A RUA
     # =========================
 
     if player.colliderect(road):
 
+        # Não pode atravessar fora da faixa
         if not player.colliderect(crosswalk):
             reset_game()
 
+        # Mesmo na faixa, precisa apertar o botão antes
+        elif not crosswalk_active:
+            reset_game()
+
     # =========================
-    # CHEGOU AO HOSPITAL
+    # CHEGOU À ESCOLA
     # =========================
 
-    if player.colliderect(hospital):
+    if player.colliderect(school):
         return "menu"
 
     # =========================
@@ -304,14 +374,15 @@ def run_phase3(screen):
     # FAIXA
     # =========================
 
-    for y in range(210, 340, 25):
+    if crosswalk_active:
+        for y in range(210, 340, 25):
 
-        pygame.draw.rect(
-            screen,
-            WHITE,
-            (365, y, 50, 14),
-            border_radius=4
-        )
+            pygame.draw.rect(
+                screen,
+                WHITE,
+                (365, y, 50, 14),
+                border_radius=4
+            )
 
     # =========================
     # PISO TÁTIL
@@ -338,6 +409,12 @@ def run_phase3(screen):
                 )
 
     # =========================
+    # BOTÃO DO SEMÁFORO
+    # =========================
+
+    draw_crossing_button(screen)
+
+    # =========================
     # CARROS
     # =========================
 
@@ -345,10 +422,10 @@ def run_phase3(screen):
         draw_car(screen, car)
 
     # =========================
-    # HOSPITAL
+    # ESCOLA
     # =========================
 
-    draw_hospital(screen)
+    draw_school(screen)
 
     # =========================
     # PLAYER
@@ -361,12 +438,29 @@ def run_phase3(screen):
     # =========================
 
     text = font.render(
-        "Siga o piso tatil e atravesse na faixa",
+        "Siga o piso tatil, aperte E no botao e atravesse para chegar na escola",
         True,
         BLACK
     )
 
-    screen.blit(text, (140, 20))
+    screen.blit(text, (35, 20))
+
+    if player.colliderect(crossing_button) and not crosswalk_active:
+        help_text = font.render(
+            "Aperte E para ativar a faixa de pedestre",
+            True,
+            BLACK
+        )
+        screen.blit(help_text, (160, 55))
+
+    if button_message_timer > 0:
+        active_text = font.render(
+            "Faixa ativada! Atravesse com seguranca.",
+            True,
+            BLACK
+        )
+        screen.blit(active_text, (190, 55))
+        button_message_timer -= 1
 
     # =========================
     # VISÃO
