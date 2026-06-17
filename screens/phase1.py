@@ -2,6 +2,7 @@ import pygame
 import random
 
 from screens import ui
+import screens.sprites as sprites
 
 pygame.init()
 
@@ -139,6 +140,10 @@ def enter_phase():
 
 def draw_player(screen):
 
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "player", player.x, player.y):
+        return
+
     pygame.draw.circle(
         screen,
         (255, 220, 180),
@@ -191,6 +196,10 @@ def draw_player(screen):
 
 def draw_tree(screen, rect):
 
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "arvore", rect.x, rect.y):
+        return
+
     pygame.draw.ellipse(
         screen,
         (50, 50, 50),
@@ -222,6 +231,10 @@ def draw_tree(screen, rect):
 # =========================
 
 def draw_car(screen, car):
+
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "carro", car.x, car.y):
+        return
 
     pygame.draw.rect(
         screen,
@@ -305,7 +318,9 @@ def run_phase1(screen):
 
     for tree in trees:
 
-        if player.colliderect(tree):
+        tree_hitbox = sprites.get_hitbox("arvore", tree.x, tree.y) or tree
+
+        if player.colliderect(tree_hitbox):
 
             player.x = old_x
             player.y = old_y
@@ -444,38 +459,42 @@ def run_phase1(screen):
         draw_tree(screen, tree)
 
     # barreira
-    pygame.draw.rect(
-        screen,
-        GRAY,
-        barrier,
-        border_radius=12
-    )
+    if not sprites.draw(screen, "barreira", barrier.x, barrier.y):
 
-    for y in range(barrier.y + 12, barrier.y + 90, 18):
-
-        pygame.draw.line(
+        pygame.draw.rect(
             screen,
-            DARK_GRAY,
-            (barrier.x, y),
-            (barrier.x + barrier.width, y),
-            3
+            GRAY,
+            barrier,
+            border_radius=12
         )
 
+        for y in range(barrier.y + 12, barrier.y + 90, 18):
+
+            pygame.draw.line(
+                screen,
+                DARK_GRAY,
+                (barrier.x, y),
+                (barrier.x + barrier.width, y),
+                3
+            )
+
     # hospital
-    pygame.draw.rect(
-        screen,
-        (240, 240, 240),
-        (620, 110, 95, 95),
-        border_radius=16
-    )
+    if not sprites.draw(screen, "hospital", 620, 110):
 
-    pygame.draw.rect(screen, (180, 220, 255), (635, 120, 16, 16), border_radius=4)
-    pygame.draw.rect(screen, (180, 220, 255), (680, 120, 16, 16), border_radius=4)
+        pygame.draw.rect(
+            screen,
+            (240, 240, 240),
+            (620, 110, 95, 95),
+            border_radius=16
+        )
 
-    pygame.draw.rect(screen, RED, (658, 130, 20, 55))
-    pygame.draw.rect(screen, RED, (640, 148, 55, 20))
+        pygame.draw.rect(screen, (180, 220, 255), (635, 120, 16, 16), border_radius=4)
+        pygame.draw.rect(screen, (180, 220, 255), (680, 120, 16, 16), border_radius=4)
 
-    pygame.draw.rect(screen, (70, 70, 70), (672, 180, 12, 20), border_radius=4)
+        pygame.draw.rect(screen, RED, (658, 130, 20, 55))
+        pygame.draw.rect(screen, RED, (640, 148, 55, 20))
+
+        pygame.draw.rect(screen, (70, 70, 70), (672, 180, 12, 20), border_radius=4)
 
     # placa rua
     
@@ -489,22 +508,24 @@ def run_phase1(screen):
 
     if not has_crosswalk:
 
-        pygame.draw.rect(
-            screen,
-            WHITE,
-            crosswalk_item,
-            border_radius=4
-        )
+        if not sprites.draw(screen, "item_faixa", crosswalk_item.x, crosswalk_item.y):
 
-        for y in range(435, 465, 6):
-
-            pygame.draw.line(
+            pygame.draw.rect(
                 screen,
-                BLACK,
-                (205, y),
-                (235, y),
-                3
+                WHITE,
+                crosswalk_item,
+                border_radius=4
             )
+
+            for y in range(435, 465, 6):
+
+                pygame.draw.line(
+                    screen,
+                    BLACK,
+                    (205, y),
+                    (235, y),
+                    3
+                )
 
         item_font = pygame.font.SysFont("Arial", 20, bold=True)
 
@@ -514,18 +535,20 @@ def run_phase1(screen):
 
     if not has_ramp:
 
-        pygame.draw.rect(
-            screen,
-            BLUE,
-            ramp_item,
-            border_radius=8
-        )
+        if not sprites.draw(screen, "item_rampa", ramp_item.x, ramp_item.y):
 
-        pygame.draw.circle(screen, WHITE, (660, 514), 7, 2)
+            pygame.draw.rect(
+                screen,
+                BLUE,
+                ramp_item,
+                border_radius=8
+            )
 
-        pygame.draw.line(screen, WHITE, (660, 521), (660, 530), 2)
-        pygame.draw.line(screen, WHITE, (660, 524), (652, 534), 2)
-        pygame.draw.line(screen, WHITE, (660, 524), (668, 534), 2)
+            pygame.draw.circle(screen, WHITE, (660, 514), 7, 2)
+
+            pygame.draw.line(screen, WHITE, (660, 521), (660, 530), 2)
+            pygame.draw.line(screen, WHITE, (660, 524), (652, 534), 2)
+            pygame.draw.line(screen, WHITE, (660, 524), (668, 534), 2)
 
         item_font = pygame.font.SysFont("Arial", 20, bold=True)
 

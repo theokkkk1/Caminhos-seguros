@@ -2,6 +2,7 @@ import pygame
 import random
 
 from screens import ui
+import screens.sprites as sprites
 
 pygame.init()
 
@@ -162,6 +163,10 @@ def enter_phase():
 
 def draw_player(screen):
 
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "player", player.x, player.y):
+        return
+
     pygame.draw.circle(
         screen,
         (255, 220, 180),
@@ -198,6 +203,10 @@ def draw_player(screen):
 
 def draw_car(screen, car):
 
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "carro", car.x, car.y):
+        return
+
     pygame.draw.rect(
         screen,
         RED,
@@ -220,6 +229,10 @@ def draw_car(screen, car):
 # =========================
 
 def draw_school(screen):
+
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "escola", school.x, school.y):
+        return
 
     pygame.draw.rect(
         screen,
@@ -245,6 +258,13 @@ def draw_school(screen):
 
 
 def draw_crossing_button(screen):
+
+    # Tenta usar imagem customizada; se não existir, desenha pelo código
+    if sprites.draw(screen, "item_botao", crossing_button.x, crossing_button.y):
+        label_font = pygame.font.SysFont("Arial", 16, bold=True)
+        label = label_font.render("BOTAO", True, BLACK)
+        screen.blit(label, (crossing_button.x - 8, crossing_button.y + 48))
+        return
 
     button_color = GREEN if crosswalk_active else ORANGE
 

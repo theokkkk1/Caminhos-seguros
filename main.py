@@ -5,6 +5,7 @@ from screens.controls import draw_controls
 from screens.phase1 import run_phase1
 from screens.phase2 import run_phase2
 from screens.phase3 import run_phase3
+import screens.sprites as sprites
 
 pygame.init()
 
@@ -17,6 +18,17 @@ HEIGHT = 600
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Caminhos Seguros")
+
+clock = pygame.time.Clock()
+
+# ==========================
+# SPRITES CUSTOMIZADOS
+# ==========================
+# Carrega as imagens de assets/sprites/ conforme sprites_config.json.
+# Se uma imagem não existir, o componente continua sendo desenhado
+# pelo código (fallback automático, sem erros).
+
+sprites.load_all()
 
 clock = pygame.time.Clock()
 

@@ -1,0 +1,41 @@
+======================================================
+  PASTA DE SPRITES - Caminhos Seguros
+======================================================
+
+Coloque aqui as imagens dos componentes do jogo.
+Formatos suportados: PNG (recomendado), JPG, BMP
+
+------------------------------------------------------
+NOMES DE ARQUIVO ESPERADOS
+------------------------------------------------------
+
+Componentes compartilhados (fases 1, 2 e 3):
+  arvore.png        → substitui a árvore desenhada no código
+  carro.png         → substitui o carro desenhado no código
+  player.png        → substitui o personagem principal
+
+Fase 1:
+  barreira.png      → substitui a barreira cinza
+  hospital.png      → substitui o hospital desenhado
+  item_faixa.png    → substitui o item de faixa de pedestres
+  item_rampa.png    → substitui o item de rampa
+
+Fase 2:
+  semaforo.png      → substitui o semáforo
+  predio.png        → substitui os prédios de fundo
+
+Fase 3:
+  escola.png        → substitui a escola
+  item_botao.png    → substitui o botão de travessia
+
+------------------------------------------------------
+DICAS
+------------------------------------------------------
+
+• Use PNG com fundo transparente para melhores resultados.
+• O tamanho e o hitbox de cada sprite são configuráveis
+  no arquivo: assets/sprites_config.json
+• Se uma imagem NÃO estiver presente, o componente
+  continuará sendo desenhado pelo código (sem erros).
+
+======================================================
