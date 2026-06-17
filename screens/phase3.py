@@ -42,6 +42,9 @@ SKY = (120, 190, 255)
 player = pygame.Rect(80, 500, 26, 42)
 player_speed = 4
 
+guide_dog = pygame.Rect(110, 520, 34, 22)
+show_intro_message = True
+
 # =========================
 # ESCOLA
 # =========================
@@ -106,6 +109,7 @@ crosswalk = pygame.Rect(330, 200, 120, 160)
 crossing_button = pygame.Rect(300, 370, 42, 42)
 crosswalk_active = False
 button_message_timer = 0
+phase_completed = False
 
 # =========================
 # CARROS
@@ -139,13 +143,15 @@ font = pygame.font.SysFont("Arial", 24, bold=True)
 
 def reset_game():
 
-    global crosswalk_active, button_message_timer
+    global crosswalk_active, button_message_timer, show_intro_message, phase_completed
 
     player.x = 80
     player.y = 500
 
     crosswalk_active = False
     button_message_timer = 0
+    show_intro_message = True
+    phase_completed = False
 
     for car in cars:
         car.x = random.randint(-500, -50)
@@ -195,6 +201,60 @@ def draw_player(screen):
         (player.x + 18, player.y + 40),
         (player.x + 22, player.y + 50),
         3
+    )
+
+    # Bengala branca
+    pygame.draw.line(
+        screen,
+        WHITE,
+        (player.x + 5, player.y + 32),
+        (player.x - 18, player.y + 58),
+        4
+    )
+
+    pygame.draw.circle(
+        screen,
+        RED,
+        (player.x - 18, player.y + 58),
+        4
+    )
+
+def draw_guide_dog(screen):
+
+    # O cao-guia anda ligeiramente a frente do personagem
+    guide_dog.x = player.x + 38
+    guide_dog.y = player.y + 12
+
+    # Corpo
+    pygame.draw.ellipse(screen, (150, 100, 55), guide_dog)
+
+    # Cabeca
+    pygame.draw.circle(
+        screen,
+        (165, 115, 65),
+        (guide_dog.x + 30, guide_dog.y + 8),
+        9
+    )
+
+    # Orelha
+    pygame.draw.circle(
+        screen,
+        (90, 60, 35),
+        (guide_dog.x + 27, guide_dog.y + 3),
+        4
+    )
+
+    # Patas
+    pygame.draw.line(screen, BLACK, (guide_dog.x + 8, guide_dog.y + 18), (guide_dog.x + 8, guide_dog.y + 27), 3)
+    pygame.draw.line(screen, BLACK, (guide_dog.x + 24, guide_dog.y + 18), (guide_dog.x + 24, guide_dog.y + 27), 3)
+
+    # Guia ligando o personagem ao cachorro
+    pygame.draw.line(
+        screen,
+        BLACK,
+        (player.x + 20, player.y + 28),
+        (guide_dog.x + 8, guide_dog.y + 10),
+        2
     )
 
 # =========================
@@ -294,16 +354,62 @@ def draw_vision_effect(screen):
 
     darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
-    darkness.fill((0, 0, 0, 220))
+    darkness.fill((0, 0, 0, 245))
 
     pygame.draw.circle(
         darkness,
         (0, 0, 0, 0),
         (player.x + 13, player.y + 20),
-        110
+        65
     )
 
     screen.blit(darkness, (0, 0))
+
+def draw_tactile_highlight(screen):
+
+    vision_center = (player.x + 13, player.y + 20)
+    vision_radius = 75
+
+    for tile in tactile_path:
+        tile_center = tile.center
+        distance = ((tile_center[0] - vision_center[0]) ** 2 + (tile_center[1] - vision_center[1]) ** 2) ** 0.5
+
+        if distance <= vision_radius:
+            pygame.draw.rect(
+                screen,
+                (255, 245, 120),
+                tile,
+                width=3,
+                border_radius=4
+            )
+
+def draw_intro_message(screen):
+
+    overlay = pygame.Surface((WIDTH, HEIGHT))
+    overlay.set_alpha(230)
+    overlay.fill((0, 0, 0))
+    screen.blit(overlay, (0, 0))
+
+    title_font = pygame.font.SysFont("Arial", 34, bold=True)
+    text_font = pygame.font.SysFont("Arial", 22)
+
+    title = title_font.render("FASE 3 - DEFICIENCIA VISUAL", True, YELLOW)
+    screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 90))
+
+    mensagens = [
+        "Voce possui baixa visao.",
+        "Use o cao guia para se orientar.",
+        "Siga o piso tatil amarelo.",
+        "Aperte E no botao para ativar a faixa.",
+        "Chegue ate a escola em seguranca.",
+        "Pressione ESPACO para iniciar."
+    ]
+
+    y = 170
+    for msg in mensagens:
+        texto = text_font.render(msg, True, WHITE)
+        screen.blit(texto, (WIDTH // 2 - texto.get_width() // 2, y))
+        y += 40
 
 # =========================
 # FASE
@@ -311,9 +417,17 @@ def draw_vision_effect(screen):
 
 def run_phase3(screen):
 
-    global crosswalk_active, button_message_timer
+    global crosswalk_active, button_message_timer, show_intro_message, phase_completed
 
     keys = pygame.key.get_pressed()
+
+    if show_intro_message:
+        draw_intro_message(screen)
+
+        if keys[pygame.K_SPACE]:
+            show_intro_message = False
+
+        return None
 
     # =========================
     # MOVIMENTO
@@ -393,6 +507,9 @@ def run_phase3(screen):
 
     reached_school = player.colliderect(school)
 
+    if reached_school:
+        phase_completed = True
+
     # =========================
     # FUNDO
     # =========================
@@ -471,6 +588,7 @@ def run_phase3(screen):
     # =========================
 
     draw_player(screen)
+    draw_guide_dog(screen)
 
     # =========================
     # TEXTO
@@ -506,11 +624,12 @@ def run_phase3(screen):
     # =========================
 
     draw_vision_effect(screen)
+    draw_tactile_highlight(screen)
 
-    if reached_school:
+    if phase_completed:
 
         overlay = pygame.Surface((WIDTH, HEIGHT))
-        overlay.set_alpha(200)
+        overlay.set_alpha(220)
         overlay.fill((0, 0, 0))
 
         screen.blit(overlay, (0, 0))
@@ -526,19 +645,29 @@ def run_phase3(screen):
             "Parabens, voce completou Caminhos Seguros!", True, WHITE
         )
 
+        menu_text = small_font.render(
+            "Pressione ENTER para voltar ao menu", True, YELLOW
+        )
+
         screen.blit(
             title_text,
-            (WIDTH // 2 - title_text.get_width() // 2, 250)
+            (WIDTH // 2 - title_text.get_width() // 2, 220)
         )
 
         screen.blit(
             info_text,
-            (WIDTH // 2 - info_text.get_width() // 2, 310)
+            (WIDTH // 2 - info_text.get_width() // 2, 285)
         )
 
-        pygame.display.update()
-        ui.pause(1800)
+        screen.blit(
+            menu_text,
+            (WIDTH // 2 - menu_text.get_width() // 2, 340)
+        )
 
-        return "menu"
+        if keys[pygame.K_RETURN]:
+            reset_game()
+            return "menu"
+
+        return None
 
     return None
