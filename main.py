@@ -4,7 +4,7 @@ import screens.menu as draw_menu
 from screens.controls import draw_controls
 from screens.phase1 import run_phase1
 from screens.phase2 import run_phase2
-from screens.phase3 import run_phase3
+from screens.phase3 import run_phase3, enter_phase as enter_phase3
 
 pygame.init()
 
@@ -76,6 +76,7 @@ while running:
             if current_screen == MENU:
 
                 if event.key == pygame.K_3:
+                    enter_phase3()
                     current_screen = PHASE3
 
             elif current_screen == CONTROLS:
