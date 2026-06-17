@@ -4,12 +4,8 @@ import screens.menu as draw_menu
 from screens.controls import draw_controls
 from screens.phase1 import run_phase1
 from screens.phase2 import run_phase2
-<<<<<<< HEAD
-from screens.phase3 import run_phase3
-import screens.sprites as sprites
-=======
 from screens.phase3 import run_phase3, enter_phase as enter_phase3
->>>>>>> fix/phase3
+import screens.sprites as sprites
 
 pygame.init()
 
