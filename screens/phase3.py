@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from screens import ui
+
 pygame.init()
 
 # =========================
@@ -46,8 +48,11 @@ player_speed = 4
 school = pygame.Rect(640, 60, 120, 120)
 
 # =========================
-# PISO TÁTIL
+# PISO TATIL
 # =========================
+# O piso tatil agora atravessa a rua exatamente por dentro da faixa
+# de pedestre pintada (antes ele contornava a faixa por fora, levando
+# o jogador ao redor da rua em vez de atraves da travessia segura).
 
 tactile_path = [
     pygame.Rect(100, 520, 40, 20),
@@ -58,26 +63,34 @@ tactile_path = [
     pygame.Rect(300, 520, 40, 20),
     pygame.Rect(340, 520, 40, 20),
 
-    pygame.Rect(360, 480, 20, 40),
-    pygame.Rect(360, 440, 20, 40),
-    pygame.Rect(360, 400, 20, 40),
+    pygame.Rect(375, 480, 20, 40),
+    pygame.Rect(375, 440, 20, 40),
+    pygame.Rect(375, 400, 20, 40),
+    pygame.Rect(375, 360, 20, 40),
+    pygame.Rect(375, 320, 20, 40),
+    pygame.Rect(375, 280, 20, 40),
+    pygame.Rect(375, 240, 20, 40),
+    pygame.Rect(375, 200, 20, 40),
 
-    pygame.Rect(360, 360, 40, 20),
-    pygame.Rect(400, 360, 40, 20),
-    pygame.Rect(440, 360, 40, 20),
-    pygame.Rect(480, 360, 40, 20),
-    pygame.Rect(520, 360, 40, 20),
-
-    pygame.Rect(560, 320, 20, 40),
-    pygame.Rect(560, 280, 20, 40),
-    pygame.Rect(560, 240, 20, 40),
+    pygame.Rect(400, 180, 40, 20),
+    pygame.Rect(440, 180, 40, 20),
+    pygame.Rect(480, 180, 40, 20),
+    pygame.Rect(520, 180, 40, 20),
+    pygame.Rect(560, 180, 40, 20),
 ]
 
 # =========================
 # RUA
 # =========================
+# A rua (e a colisao de "precisa estar na faixa") cobre a LARGURA
+# TOTAL da tela, porque os carros tambem trafegam de ponta a ponta.
+# Antes a rua era so um trecho central (250-550) e os carros, ao
+# saírem dele, ficavam visualmente "andando" por cima da calcada e
+# da grama -- alem disso, dava pra desviar da faixa de pedestre
+# simplesmente contornando esse trecho por fora, sem nunca precisar
+# usar a faixa. Cobrindo a tela inteira corrige os dois problemas.
 
-road = pygame.Rect(250, 200, 300, 160)
+road = pygame.Rect(0, 200, WIDTH, 160)
 
 # =========================
 # FAIXA DE PEDESTRE
@@ -135,6 +148,13 @@ def reset_game():
 
     for car in cars:
         car.x = random.randint(-500, -50)
+
+
+def enter_phase():
+    """Chamado sempre que se entra nesta fase a partir de outra tela,
+    garantindo que ela comece sempre do zero."""
+
+    reset_game()
 
 # =========================
 # PLAYER
@@ -351,8 +371,7 @@ def run_phase3(screen):
     # CHEGOU À ESCOLA
     # =========================
 
-    if player.colliderect(school):
-        return "menu"
+    reached_school = player.colliderect(school)
 
     # =========================
     # FUNDO
@@ -467,5 +486,39 @@ def run_phase3(screen):
     # =========================
 
     draw_vision_effect(screen)
+
+    if reached_school:
+
+        overlay = pygame.Surface((WIDTH, HEIGHT))
+        overlay.set_alpha(200)
+        overlay.fill((0, 0, 0))
+
+        screen.blit(overlay, (0, 0))
+
+        victory_font = pygame.font.SysFont("Arial", 36, bold=True)
+        small_font = pygame.font.SysFont("Arial", 24)
+
+        title_text = victory_font.render(
+            "VOCE CHEGOU A ESCOLA!", True, GREEN
+        )
+
+        info_text = small_font.render(
+            "Parabens, voce completou Caminhos Seguros!", True, WHITE
+        )
+
+        screen.blit(
+            title_text,
+            (WIDTH // 2 - title_text.get_width() // 2, 250)
+        )
+
+        screen.blit(
+            info_text,
+            (WIDTH // 2 - info_text.get_width() // 2, 310)
+        )
+
+        pygame.display.update()
+        ui.pause(1800)
+
+        return "menu"
 
     return None

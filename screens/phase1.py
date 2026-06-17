@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from screens import ui
+
 pygame.init()
 
 # =========================
@@ -120,6 +122,16 @@ def reset_game():
 
     for car in cars:
         car.y = random.randint(-600, -50)
+
+
+def enter_phase():
+    """Chamado sempre que se entra nesta fase a partir de outra tela,
+    garantindo que ela comece sempre do zero (corrige o bug em que
+    voltar a jogar a Fase 1 apos terminar o jogo podia disparar a
+    vitoria instantaneamente, pois o jogador ainda estava parado
+    dentro do hospital com os itens ja coletados)."""
+
+    reset_game()
 
 # =========================
 # PLAYER
@@ -343,7 +355,7 @@ def run_phase1(screen):
             screen.blit(txt, (230, 260))
 
             pygame.display.update()
-            pygame.time.delay(1200)
+            ui.pause(1200)
 
             reset_game()
 
@@ -658,6 +670,6 @@ def run_phase1(screen):
             )
 
             pygame.display.update()
-            pygame.time.delay(1500)
+            ui.pause(1500)
 
             return "phase2"
